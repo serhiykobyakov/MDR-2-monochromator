@@ -1,1 +1,1 @@
-# MDR-2-monochromator
+# MDR-2 monochromator automatization
