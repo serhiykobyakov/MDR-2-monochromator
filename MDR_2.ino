@@ -1,8 +1,8 @@
 // MDR-2
-// -*- mode: C++ -*-
+// Version 10.09.2022
 //
-// Copyright (C) 2019 Serhiy Kobyakov
-// $Id:  $
+// Copyright (C) Serhiy Kobyakov
+
 
 #include <AccelStepper.h>
 
@@ -19,9 +19,6 @@ const int BackLash = 150*microstep; // Backlash of the grating gear
 #define Buzzer 6
 
 String gotData = "";
-
-//unsigned long t0;
-//unsigned long t1;
 
 // Define the stepper and the pins it will use
 AccelStepper grating(AccelStepper::DRIVER, GRATING_STEP_PIN, GRATING_DIR_PIN);
@@ -91,38 +88,7 @@ void HitEndstop() {
     if (digitalRead(L_end)) Serial.println("L");
   }
 }
-/*
-void goTo() {
-  delay(5);
-  if(Serial.available() > 0) {
-    gotData = Serial.readStringUntil('\n');
-    long pos = gotData.toInt();
-    if (pos != grating.currentPosition()) {
-      if (pos >= grating.currentPosition()) {
-        grating.moveTo(pos);
-        while (grating.distanceToGo() != 0) {
-          if (digitalRead(R_end) || digitalRead(L_end)) { HitEndstop(); break; }
-          grating.run();
-        }
-      }
-      else {
-        grating.moveTo(pos - BackLash);
-        while (grating.distanceToGo() != 0) {
-          if (digitalRead(R_end) || digitalRead(L_end)) { HitEndstop(); break; }
-          grating.run();
-        }
-        delay(500);
-        grating.moveTo(pos);
-        while (grating.distanceToGo() != 0) {
-          if (digitalRead(R_end) || digitalRead(L_end)) { HitEndstop(); break; }
-          grating.run();
-        }
-      }
-    }
-    Serial.println(grating.currentPosition());    
-  } 
-}
-*/
+
 
 void goTo() {
   if (Serial.available() > 0) {
@@ -160,7 +126,6 @@ void parkGrating() {
       grating.run();
     } 
   }
-//  Serial.println(grating.currentPosition());
 }
 
 word getRead() {
@@ -174,6 +139,7 @@ word getRead() {
   return theRead;
 } 
 
+
 void initMDR(){
   word signRead = 0;
   word signMax = 0;
@@ -183,7 +149,7 @@ void initMDR(){
   grating.setAcceleration(MAXACCEL/6);
   grating.moveTo(-100000);
   while (grating.distanceToGo() != 0) {
-    if (digitalRead(L_end)) grating.setCurrentPosition(0);            
+    if (digitalRead(L_end)) grating.setCurrentPosition(0);
     grating.run();
   }
   
@@ -192,64 +158,9 @@ void initMDR(){
   grating.setAcceleration(MAXACCEL);  
   grating.moveTo(13000);
   while (grating.distanceToGo() != 0) {
-//    if (digitalRead(R_end) || digitalRead(L_end)) HitEndstop();            
     grating.run();
   }
   grating.setCurrentPosition(0);
-//  Serial.print("11111 ");
-//  Serial.println(15000);  
-  
-/*  
-  delay(600);
-// едем в начало сканирования диапазона зеркального отражения  
-  grating.moveTo(3300);
-  while (grating.distanceToGo() != 0) {
-//    if (digitalRead(R_end) || digitalRead(L_end)) HitEndstop();            
-    grating.run();
-  }
-
-  grating.setCurrentPosition(0);
-
-// сканируем до конца диапазона зеркального отражения
-  while (grating.currentPosition() < 100) {
-    grating.moveTo(grating.currentPosition() + 1);
-    while (grating.distanceToGo() != 0) {
-      grating.run();
-    }
-    delay(50);
-    Serial.print(grating.currentPosition());
-    signRead = getRead();
-      Serial.print(" ");
-      Serial.println(signRead);
-    if (signRead > signMax) {
-      signMax = signRead;
-      thePos = grating.currentPosition();
-    }
-  }
-
-  grating.setMaxSpeed(MAXSPEED);
-  grating.setAcceleration(MAXACCEL);
-
-  if (signMax < 1000) {
-//    signMax = 0;
-    digitalWrite(Buzzer, HIGH);
-    delay(4000);
-    digitalWrite(Buzzer, LOW);
-  }
-  else {
-    // go to position "0"
-    grating.moveTo(thePos + 1200*microstep); // 1200 is the distance from
-                                   //  grating mirror reflection to "0" position
-    while (grating.distanceToGo() != 0) {
-      if (digitalRead(R_end) || digitalRead(L_end)) { HitEndstop(); break; }
-      grating.run();
-    }
-    grating.setCurrentPosition(0);
-    beepn(4);
-  }
-    Serial.print("11111 ");
-    Serial.println(signMax);
-*/    
 }
 
 void loop() {  
@@ -275,7 +186,7 @@ void loop() {
       case 'i':
           delay(4);
           initMDR();
-          Serial.println(grating.currentPosition());          
+          Serial.println(grating.currentPosition());
           break;
           
 // get position
@@ -300,7 +211,7 @@ void loop() {
           break;
 
       default:
-          break;           
+          break;
     }
   }
 }
