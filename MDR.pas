@@ -1,4 +1,10 @@
 unit MDR;
+{
+Lomo MDR-2 monochromator unit
+Version 11.09.2022
+
+(c) Serhiy Kobyakov
+}
 
 
 interface
@@ -23,8 +29,8 @@ type
       fPos: Cardinal;
 //      frDisp: Extended;
       fGrating: byte;
-      fA0: array[0..1] of Extended;
-      fA1: array[0..1] of Extended;
+      fA0: array[0..2] of Extended;
+      fA1: array[0..2] of Extended;
       function GetGrating: Byte;
       function GetPosNm: Real;
       procedure SetGrating(AValue: Byte);
@@ -107,6 +113,7 @@ var
   UpperInitStr, iniFile: string;
 begin
 // -----------------------------------------------------------------------------
+// first things first
 // the device ID string with which it responds to '?'
   theDeviceID := 'MDR-2';
 // -----------------------------------------------------------------------------
@@ -115,10 +122,9 @@ begin
   If not FileExists(iniFile) then
     begin
       showmessage(theDeviceID + ':' + LineEnding +
-                  'procedure ''' + {$I %CURRENTROUTINE%} + ''' failed!' + LineEnding +
-                  'File ' + LineEnding + iniFile + LineEnding +
-                  'has not been found!' + LineEnding + LineEnding +
-                  'Please fix it');
+          'procedure ''' + {$I %CURRENTROUTINE%} + ''' failed!' + LineEnding +
+          'File ' + iniFile + 'has not been found!' + LineEnding +
+          'Please fix it');
       halt(0);
     end;
 
@@ -137,7 +143,6 @@ begin
      AnchorHorizontalCenterTo(MyForm); end;
 
   MyForm.Show; MyForm.BringToFront;
-
   UpperInitStr := 'Initializing ' + theDeviceID + ':' + LineEnding;
 
   MyLabel.Caption:= UpperInitStr + 'Reading ' + theDeviceID + '.ini...';
@@ -146,24 +151,10 @@ begin
 // -----------------------------------------------------------------------------
 // Read the device variables from ini file:
   AppIni := TInifile.Create(iniFile);
-    theComPortSpeed := AppIni.ReadInteger(theDeviceID, 'ComPortSpeed', 115200);
-
-// max time in ms the device may take for its internal initialization
-    theInitTimeout := AppIni.ReadInteger(theDeviceID, 'InitTimeout', 3000);
-
-// max time in ms the device may take before answer
-// it is good idea to measure the longest run
-// before assign the value
-    theLongReadTimeout := AppIni.ReadInteger(theDeviceID, 'LongReadTimeout', 3000);
-
-// max time in ms the device may take before answer
-// in the case of simple and fast queries
-    theReadTimeout := AppIni.ReadInteger(theDeviceID, 'ReadTimeout', 1000);
-
-// other device-specific paremeters:
+// device-specific paremeters:
     fMaxPos := AppIni.ReadInteger(theDeviceID, 'MaxPos', 32800);
     fGrating := AppIni.ReadInteger(theDeviceID, 'Grating', 0);
- //   frDisp := StrToFloat(AppIni.ReadString(theDeviceID, 'rDisp', '1'));
+//   frDisp := StrToFloat(AppIni.ReadString(theDeviceID, 'rDisp', '1'));
     fA0[0] := Str2Float(AppIni.ReadString(theDeviceID, 'G1A0', '1'));
     fA1[0] := Str2Float(AppIni.ReadString(theDeviceID, 'G1A1', '0'));
     fA0[1] := Str2Float(AppIni.ReadString(theDeviceID, 'G2A0', '1'));
@@ -177,6 +168,11 @@ begin
   MyLabel.Caption:= UpperInitStr + 'Connecting to ' + _ComPort + '...';
   sleepFor(200); // refresh the Label to see the change
   Inherited Init(_ComPort);
+
+// Now, when communication with the device has been established
+// we can send him commands
+// Here we send those commands which are necessary before
+// we start to work with the device
 
   MyLabel.Caption:= UpperInitStr + 'Done!';
   sleepFor(500); // refresh the Label just to see "Done"

@@ -1,8 +1,7 @@
-// MDR-2
-// Version 10.09.2022
+// MDR-2 monochromator
+// Version: 11.09.2022
 //
-// Copyright (C) Serhiy Kobyakov
-
+// (c) Serhiy Kobyakov
 
 #include <AccelStepper.h>
 
@@ -53,10 +52,12 @@ void setup()
 // alarm if grating hit endstops
   if (digitalRead(R_end) || digitalRead(L_end)) HitEndstop();
     
-// setup done, sound and go!    
   delay(30);
   digitalWrite(Buzzer, LOW);
+
+  Serial.println("Ready!");
 }
+
 
 void beepn(int times) {
   for (int i = 0; i < times; i++) {
@@ -67,6 +68,7 @@ void beepn(int times) {
   }
 }
 
+
 void beepE(int times) {
   for (int i = 0; i < times; i++) {
     digitalWrite(Buzzer, HIGH);
@@ -75,6 +77,7 @@ void beepE(int times) {
     delay(400);
   }
 }
+
 
 void HitEndstop() {
   grating.stop();
@@ -128,6 +131,7 @@ void parkGrating() {
   }
 }
 
+
 word getRead() {
   word theRead = 0;
   byte sample_count = 0;
@@ -140,7 +144,7 @@ word getRead() {
 } 
 
 
-void initMDR(){
+void initMDR() {
   word signRead = 0;
   word signMax = 0;
   long thePos = 0;
@@ -149,7 +153,7 @@ void initMDR(){
   grating.setAcceleration(MAXACCEL/6);
   grating.moveTo(-100000);
   while (grating.distanceToGo() != 0) {
-    if (digitalRead(L_end)) grating.setCurrentPosition(0);
+    if (digitalRead(L_end)) grating.setCurrentPosition(0);            
     grating.run();
   }
   
@@ -162,6 +166,7 @@ void initMDR(){
   }
   grating.setCurrentPosition(0);
 }
+
 
 void loop() {  
   if (digitalRead(R_end) || digitalRead(L_end)) HitEndstop();
@@ -186,7 +191,7 @@ void loop() {
       case 'i':
           delay(4);
           initMDR();
-          Serial.println(grating.currentPosition());
+          Serial.println(grating.currentPosition());          
           break;
           
 // get position
@@ -211,7 +216,9 @@ void loop() {
           break;
 
       default:
-          break;
+          break;           
     }
   }
 }
+
+ 
