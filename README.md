@@ -2,11 +2,11 @@
 
 ## What is it
 
-I attached a stepper motor to monochromator and now it can be positioned using PC instead of old-fashion manual control.
+Here you can find a code to control automated MDR-2 monochromator. I attached a stepper motor to the monochromator and now it can be positioned using PC instead of old-fashion manual control.
 
 Here I have only the software without all the other stuff (circuitry and mechanic stuff). Arduino sketch and Free Pascal unit for MDR-2 monochromator.
 
-The software has been tested for errors, stability and speed.
+The software has been tested for errors, stability and speed under Linux.
 
 ## Install
 
